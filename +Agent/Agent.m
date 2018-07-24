@@ -37,7 +37,7 @@ classdef Agent < handle
         altitudeControl
         
         % System Constraints
-        maxTurn = 180;
+        maxTurn = 2;
         maxSpeed = 10;
         minSpeed = 2;
         mass = 1;
@@ -107,7 +107,7 @@ classdef Agent < handle
             if self.targetPoint.isArrived()
                 self.targetPoint.setTarget(self.searchPattern.nextPath());
             end
-            [chaseSpeed, chaseTurning] = self.chasingTarget.getSpeedAndTurning(self.targetPoint);
+            [chaseForce, chaseTurning] = self.chasingTarget.getForceAndTurning(self.targetPoint);
             
             [isAvoid, avoidSpeed, avoidTurning] = self.avoidAgentCollition.avoid();
             
@@ -115,7 +115,7 @@ classdef Agent < handle
                 move(self,avoidSpeed,avoidTurning,timeSampling);
                 fprintf("id = %d, %f, %f \n", self.id, avoidSpeed, avoidTurning);
             else
-                move(self,chaseSpeed,chaseTurning,timeSampling);
+                move(self,chaseForce,chaseTurning,timeSampling);
             end
             
             updateDraw(self);
@@ -159,13 +159,17 @@ classdef Agent < handle
         
         %% move
         
-        function move(self,speed,turning,timeSampling)
-            self.speed = speed;
+        function move(self,force,turning,timeSampling)
             
+            %% body frame
+            acceleration = force/self.mass;         
             
-            self.heading = self.heading + turning*timeSampling;
-            self.positionX = self.positionX + speed*sind(self.heading)*timeSampling;
-            self.positionY = self.positionY + speed*cosd(self.heading)*timeSampling;
+            %% earth frame
+            
+            self.heading = turningDynamics(self,turning,timeSampling);
+            self.speed = speedDynamics(self,acceleration,timeSampling);
+            self.positionX = self.positionX + self.speed*sind(self.heading)*timeSampling;
+            self.positionY = self.positionY + self.speed*cosd(self.heading)*timeSampling;
         
         end
         
@@ -173,25 +177,27 @@ classdef Agent < handle
         
         %% movement control
         
-        function heading = turningDynamics(self,turning)
+        function heading = turningDynamics(self,turning,timeSampling)
+            
+            turnMV = turning;
             if turning > 180
-                turning = turning - 360;
-            end
-
-            if turning > 0
-                % turn right
-                value = min(self.maxTurn,turning);
-            else
-                % turn left
-                value = max(-self.maxTurn,turning);
+                turnMV = turnMV - 360;
             end
             
-            turning = value;
+            
+            if turnMV >= 0
+                % turn right
+                value = min(self.maxTurn,turnMV);
+            else
+                % turn left
+                value = max(-self.maxTurn,turnMV);
+            end
+            heading = self.heading + value;
         end
         
-        function value = calculateSpeedValue(self,setPoint,currentValue)
-            speedMV = self.speedControl.getManipulatedVariable(setPoint,currentValue);
-            value = max(self.minSpeed,(min(self.maxSpeed,speedMV)));
+        function value = speedDynamics(self,acceleration,timeSampling)
+            speed = acceleration
+            value = max(self.minSpeed,(min(self.maxSpeed,speed)));
         end
         
         

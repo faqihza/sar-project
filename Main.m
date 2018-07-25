@@ -10,7 +10,7 @@ import Victim.createVictims
 % Environment(sizeX,sizeY,windDirection,windSpeed,eSun,reflectionValue)
 environment = Environment(100,100,90,10,1,1.7);
 % Agent(initialPositionX, initialPositionY, id, color)
-agents = createAgents(4,[20 20],'b');
+agents = createAgents(1,[20 20],'b');
 % createVictims(victimNumber,initialPositionX, initialPositionY,color)
 victims = createVictims(5,50,50,'r');
 

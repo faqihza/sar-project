@@ -16,6 +16,7 @@ classdef Agent < handle
         speedX
         speedY
         speed
+        turningRate
         turningAngle
         
         % Sensor
@@ -37,10 +38,11 @@ classdef Agent < handle
         altitudeControl
         
         % System Constraints
-        maxTurn = 2;
+        maxTurn = 60;
         maxSpeed = 10;
         minSpeed = 2;
         mass = 1;
+        inertia = 1;
         
         % Display Parameter
         displayHandler
@@ -54,6 +56,8 @@ classdef Agent < handle
     
     properties (Access = 'private')
         environment
+        dragTranslation = 0.05;
+        dragAngular = 0.5;
     end
     
     methods
@@ -72,6 +76,7 @@ classdef Agent < handle
             self.heading = randi([0 360],1);
             self.altitude = 10;
             self.speed = 0;
+            self.turningRate = 0;
             self.speedX = 0;
             self.speedY = 0;
             self.displayColor = color;
@@ -154,20 +159,15 @@ classdef Agent < handle
     
     methods (Access = 'private')
         
-        %% createPattern
-        
-        
         %% move
         
         function move(self,force,turning,timeSampling)
             
-            %% body frame
-            acceleration = force/self.mass;         
-            
             %% earth frame
             
             self.heading = turningDynamics(self,turning,timeSampling);
-            self.speed = speedDynamics(self,acceleration,timeSampling);
+            self.speed = speedDynamics(self,force,timeSampling);
+            disp(self.speed);
             self.positionX = self.positionX + self.speed*sind(self.heading)*timeSampling;
             self.positionY = self.positionY + self.speed*cosd(self.heading)*timeSampling;
         
@@ -179,10 +179,10 @@ classdef Agent < handle
         
         function heading = turningDynamics(self,turning,timeSampling)
             
-            turnMV = turning;
-            if turning > 180
-                turnMV = turnMV - 360;
-            end
+            turnMV = turning/self.inertia;
+%             if turning > 180
+%                 turnMV = turnMV - 360;
+%             end
             
             
             if turnMV >= 0
@@ -192,12 +192,19 @@ classdef Agent < handle
                 % turn left
                 value = max(-self.maxTurn,turnMV);
             end
-            heading = self.heading + value;
+            
+            self.turningRate = self.turningRate - self.dragAngular*self.turningRate + value*timeSampling;
+            heading = self.heading + self.turningRate;
         end
         
-        function value = speedDynamics(self,acceleration,timeSampling)
-            speed = acceleration
-            value = max(self.minSpeed,(min(self.maxSpeed,speed)));
+        function value = speedDynamics(self,force,timeSampling)
+            acceleration = force/self.mass;
+            maxAccel = 50;
+            minAccel = 10;
+            acceleration = max(minAccel,(min(maxAccel,acceleration)));
+            speed = self.speed - self.dragTranslation*self.speed + acceleration*timeSampling;
+            value = speed;
+%             value = max(self.minSpeed,(min(self.maxSpeed,speed)));
         end
         
         

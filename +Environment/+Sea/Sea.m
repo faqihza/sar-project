@@ -2,7 +2,7 @@ classdef Sea < handle
     %SEA Summary of this class goes here
     %   Detailed explanation goes here
     
-    properties
+    properties (Access = 'private')
         reflectionValue;
         seaSurfaceCurrentX;
         seaSurfaceCurrentY;

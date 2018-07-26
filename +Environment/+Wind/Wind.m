@@ -2,7 +2,7 @@ classdef Wind < handle
     %WIND Summary of this class goes here
     %   Detailed explanation goes here
     
-    properties (Access = private)
+    properties (Access = 'private')
         direction
         speed
         baseDirection
@@ -16,7 +16,6 @@ classdef Wind < handle
             self.baseDirection = direction;
             self.baseSpeed = speed;
         end
-        
         
         function value = getBaseDirection(self)
             value = self.baseDirection;

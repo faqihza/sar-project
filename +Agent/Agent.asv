@@ -61,7 +61,6 @@ classdef Agent < handle
     end
     
     methods
-        %% constructor
         function self = Agent(initialPosition, id, color)
             import Agent.Sensor.Camera
             import Agent.Sensor.Proximity
@@ -82,24 +81,24 @@ classdef Agent < handle
             self.speedY = 0;
             self.displayColor = color;
             
-            % sensor Creation
+            %% sensor Creation
             % Camera(size,coverageAngle,tiltAngle)
             self.camera = Camera(self, 10, 60, 0);
             % Proximity(agent,innerRadius,outerRadius)
             self.proximitySensor = Proximity(self,5,10);
             
             
-            % Search Pattern Creation
+            %% Search Pattern Creation
             self.searchPattern = CreepingLine();
             % calculatePath(self,stepSize,initialPositionX,initialPositionY,heading,sizeX,sizeY,sweepRadius)
             self.searchPattern.calculatePath(1,50,50,45,30,30,2);
             self.targetPoint = TargetPoint(self.searchPattern.nextPath(),self);
             
-            % behaviour assignment
+            %% behaviour assignment
             self.chasingTarget = ChaseTarget(self);
             self.avoidAgentCollition = AvoidAgentCollition(self,self.proximitySensor);
             
-            % Controller Creation
+            %% Controller Creation
             proportional = 1;
             integral = 0;
             derivative = 0.5;
@@ -108,7 +107,6 @@ classdef Agent < handle
             self.speedControl = PIDController(proportional,integral,derivative);
         end
         
-        %% updater
         function update(self,timeSampling)
             % chasing target
             if self.targetPoint.isArrived()
@@ -128,25 +126,22 @@ classdef Agent < handle
             updateDraw(self);
         end
         
-        function measure(self)
-            self.camera.measure(self.environment);
-            self.camera.show();
-        end
-        
-        %% getter
-        function value = getId(self)
-            value = self.id;
-        end
-        
         function output = getHeading(self)
             output = self.heading;
         end
         
         function output = getAltitude(self)
-            output = self.altitude;
+            
+        
+        function measure(self)
+            self.camera.measure(self.environment);
+            self.camera.show();
         end
         
-        %% setter
+        %% getter and setter
+        function value = getId(self)
+            value = self.id;
+        end
         
         function setEnvironment(self,environmentObject)
             self.environment = environmentObject;
@@ -155,7 +150,6 @@ classdef Agent < handle
         function initNeighbours(self)
             self.avoidAgentCollition.registerRemainingAgent(self.environment.getAgents());
         end
-        
         function initShow(self)
             initNeighbours(self)
             initDraw(self);
@@ -185,6 +179,8 @@ classdef Agent < handle
             self.positionY = self.positionY + self.speed*cosd(self.heading)*timeSampling;
         
         end
+        
+        
         
         %% movement control
         

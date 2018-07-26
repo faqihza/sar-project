@@ -1,6 +1,6 @@
 classdef Sun < handle
     
-    properties
+    properties (Access = private)
         % sun properties
         azimuth
         zenith
@@ -13,9 +13,6 @@ classdef Sun < handle
         % know the wind from the environment
         wind
         sea
-    end
-    
-    properties (Access = private)
         sunData
     end
     
@@ -34,9 +31,7 @@ classdef Sun < handle
 			self.state = selectedData.state;
 			self.stateIndex = selectedData.stateIndex;
         end
-        
-        
-        
+    
         function radiance = getRadiance(self,cameraObject)
             radiance = calcRadianceValues(self,...
                 self.azimuth,... 
@@ -44,11 +39,11 @@ classdef Sun < handle
                 self.eSun,...
                 self.sea.getReflectionValue(),...
                 self.wind.getSpeed(),...
-                cameraObject.host.heading,...
-                cameraObject.host.altitude,...
-                cameraObject.size,...
-                cameraObject.coverageAngle,...
-                cameraObject.tiltAngle);
+                cameraObject.getHeading(),...
+                cameraObject.getAltitude(),...
+                cameraObject.getResolution(),...
+                cameraObject.getCoverage(),...
+                cameraObject.getTilt());
         end
         
         function showGraph(self)

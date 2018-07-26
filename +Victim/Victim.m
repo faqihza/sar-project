@@ -2,7 +2,11 @@ classdef Victim < handle
     %VICTIM Summary of this class goes here
     %   Detailed explanation goes here
     
-    properties
+    properties (Access = 'private')
+        displayShape = [0.5 0.5 1;-0.5 0.5 1; -0.5 -0.5 1;0.5 -0.5 1];
+        dragCoefficient = 0.5;
+        environment;
+        
         % attribute
         id
         color
@@ -15,13 +19,6 @@ classdef Victim < handle
         
         % display handler
         displayHandler
-        
-    end
-    
-    properties (Access = 'private')
-        displayShape = [0.5 0.5 1;-0.5 0.5 1; -0.5 -0.5 1;0.5 -0.5 1];
-        dragCoefficient = 0.5;
-        environment;
     end
     
     methods

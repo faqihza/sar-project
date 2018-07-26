@@ -2,7 +2,7 @@ classdef Camera < handle
     %CAMERA Summary of this class goes here
     %   Detailed explanation goes here
     
-    properties
+    properties (Access = 'private')
         data
         size
         coverageAngle
@@ -22,6 +22,26 @@ classdef Camera < handle
             self.coverageAngle = coverageAngle;
             self.tiltAngle = tiltAngle;
             self.host = agent;
+        end
+        
+        function output = getHeading(self)
+            output = self.host.getHeading();
+        end
+        
+        function output = getAltitude(self)
+            output = self.host.getAltitude();
+        end
+        
+        function output = getResolution(self)
+            output = self.size;
+        end
+        
+        function output = getCoverage(self)
+            output = self.coverageAngle;
+        end
+        
+        function output = getTilt(self)
+            output = self.tiltAngle;
         end
         
         function measure(self, environmentObject)

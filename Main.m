@@ -25,6 +25,7 @@ fig = figure(1);
 clf(fig);
 subplot(3,3,[1,2,4,5,7,8]);
 environment.initVisualisation();
+
 for i=1:length(agents)
     agents(i).initShow();
 end
